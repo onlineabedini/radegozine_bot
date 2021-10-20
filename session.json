@@ -1,0 +1,19 @@
+{
+  "sessions": [
+    {
+      "id": "2075704306:2075704306",
+      "data": {
+        "stateData": {
+          "Fullname": "طرح ها",
+          "Field": "طرح ها",
+          "Grade": "دوازدهم"
+        },
+        "state": "getstudentfullname"
+      }
+    },
+    {
+      "id": "1760285743:1760285743",
+      "data": {}
+    }
+  ]
+}
