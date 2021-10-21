@@ -3,7 +3,21 @@ const Adviser = require("../Adviser")
 const Student = require("../Student")
 const Users = require("../User")
 let question
-
+const {
+    ENTERADMINFULLNAME,
+    ENTERADVISERFULLNAME,
+    ENTERFIELD,
+    ENTERGRADE,
+    ENTERQUESTION,
+    ADMINCONFIRMMESSAGE,
+    ADVISERCONFIRMMESSAGE,
+    DUPLICATEADMIN,
+    DUPLICATEADVISER,
+    SENDMESSAGEWASSUCCESSFUL,
+    SENDMESSAGEFORADVISERSWASSUCCESSFUL,
+    SENDMESSAGEFORSTUDENTSWASSUCCESSFUL,
+    QUESTIONREGISTERED,
+} = require("./MessageHandler")
 const STATE_LIST = {
     ADDADMIN: "addadmin",
     GETADMINFULLNAME: "getadminfullname",
@@ -38,28 +52,33 @@ const EventListener = {
     [STATE_LIST.ADDADMIN]: (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.message) {
-            const AdminUserName = ctx.message.text
-            ctx.session.stateData = {...ctx.session.stateData, AdminUserName}
+            const AdminUsername = ctx.message.text
+            ctx.session.stateData = {...ctx.session.stateData, AdminUsername}
             ctx.session.state = STATE_LIST.GETADMINFULLNAME
-            ctx.reply("لطفا نام و نام خانوادگی ادمین را وارد نمایید:")
+            ctx.reply(ENTERADMINFULLNAME)
         } else next()
-    }, [STATE_LIST.GETADMINFULLNAME]: (ctx, next) => {
+    }, [STATE_LIST.GETADMINFULLNAME]: async (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.message) {
-            const AdminFullName = ctx.message.text
-            ctx.session.stateData = {...ctx.session.stateData, AdminFullName}
-            AddNewAdmin()
+            const AdminFullname = ctx.message.text
+            ctx.session.stateData = {...ctx.session.stateData, AdminFullname}
+            const AdminData = await Admin.findOne({Username: ctx.session.stateData.AdminUsername})
+            if (!AdminData) {
+                AddNewAdmin()
+                ctx.reply(ADMINCONFIRMMESSAGE)
+            } else {
+                ctx.reply(DUPLICATEADMIN)
+            }
 
             function AddNewAdmin() {
                 const admin = new Admin({
-                    Username: ctx.session.stateData.AdminUserName,
-                    Fullname: ctx.session.stateData.AdminFullName,
+                    Username: ctx.session.stateData.AdminUsername,
+                    Fullname: ctx.session.stateData.AdminFullname,
                 })
                 admin.save()
             }
 
             ctx.session.stateData = undefined
-            ctx.reply("ادمین با موفقیت ثبت گردید.")
         } else next()
     },
     [STATE_LIST.ADDADVISER]: (ctx, next) => {
@@ -68,14 +87,21 @@ const EventListener = {
             const AdviserUsername = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, AdviserUsername}
             ctx.session.state = STATE_LIST.GETADVISERFULLNAME
-            ctx.reply("لطفا نام و نام خانوادگی مشاور را وارد نمایید:")
+            ctx.reply(ENTERADVISERFULLNAME)
         } else next()
-    }, [STATE_LIST.GETADVISERFULLNAME]: (ctx, next) => {
+    }, [STATE_LIST.GETADVISERFULLNAME]: async (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.message) {
             const AdviserFullname = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, AdviserFullname}
-            AddNewAdviser()
+            const AdviserData = await Adviser.findOne({Username: ctx.session.stateData.AdviserUsername})
+
+            if (!AdviserData) {
+                AddNewAdviser()
+                ctx.reply(ADVISERCONFIRMMESSAGE)
+            } else {
+                ctx.reply(DUPLICATEADVISER)
+            }
 
             function AddNewAdviser() {
                 const adviser = new Adviser({
@@ -86,19 +112,18 @@ const EventListener = {
             }
 
             ctx.session.stateData = undefined
-            ctx.reply("مشاور جدید با موفقیت ثبت گردید.")
         } else next()
     },
     [STATE_LIST.SENDMESSAGEFORADVISERS]: async (ctx, next) => {
         ctx.session.state = undefined
-        const AdviserData = await Adviser.find()
-        const AdvisersChatIds = AdviserData.map(element => element.ChatId)
+        const AdvisersData = await Adviser.find()
+        const AdvisersChatIds = AdvisersData.map(element => element.ChatId)
         if (ctx.message) {
             const MessageId = ctx.message.message_id
             for (item in AdvisersChatIds) {
-                await ctx.telegram.copyMessage(AdvisersChatIds[item], ctx.message.chat.id, MessageId)
+                await ctx.telegram.forwardMessage(AdvisersChatIds[item], ctx.message.chat.id, MessageId)
             }
-            ctx.reply("پیام شما برای مشاوران با موفقیت ارسال شد")
+            ctx.reply(SENDMESSAGEFORADVISERSWASSUCCESSFUL)
         } else next()
     },
     [STATE_LIST.SENDMESSAGEFORSTUDENTS]: async (ctx, next) => {
@@ -110,7 +135,7 @@ const EventListener = {
             for (item in UsersChatIds) {
                 await ctx.telegram.copyMessage(UsersChatIds[item], ctx.message.chat.id, MessageId)
             }
-            ctx.reply("پیام شما برای دانش آموزان با موفقیت ارسال شد")
+            ctx.reply(SENDMESSAGEFORSTUDENTSWASSUCCESSFUL)
         } else next()
     }, [STATE_LIST.SENDMESSAGEFORADMINS]: async (ctx, next) => {
         ctx.session.state = undefined
@@ -122,15 +147,15 @@ const EventListener = {
             adviser.Username = username
             adviser.MessageId = messageId
             adviser.save()
-            ctx.reply("پیام شما با موفقیت ارسال شد")
-        }else next()
+            ctx.reply(SENDMESSAGEWASSUCCESSFUL)
+        } else next()
     }, [STATE_LIST.GETSTUDENTFULLNAME]: async (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.message) {
             const Fullname = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, Fullname}
             ctx.session.state = STATE_LIST.GETSTUDENTFIELD
-            ctx.reply("لطفا رشته ی تحصیلی خود را وارد نمایید:")
+            ctx.reply(ENTERFIELD)
         } else next()
     }
     , [STATE_LIST.GETSTUDENTFIELD]: async (ctx, next) => {
@@ -139,7 +164,7 @@ const EventListener = {
             const Field = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, Field}
             ctx.session.state = STATE_LIST.GETSTUDENTGRADE
-            ctx.reply("لطفا پایه ی خود را وارد نمایید:")
+            ctx.reply(ENTERGRADE)
         } else next()
     }, [STATE_LIST.GETSTUDENTGRADE]: async (ctx, next) => {
         ctx.session.state = undefined
@@ -147,7 +172,7 @@ const EventListener = {
             const Grade = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, Grade}
             ctx.session.state = STATE_LIST.ASKQUESTION
-            ctx.reply("سوال خود را وارد نمایید:")
+            ctx.reply(ENTERQUESTION)
         } else next()
     }, [STATE_LIST.ASKQUESTION]: async (ctx, next) => {
         ctx.session.state = undefined
@@ -174,7 +199,7 @@ const EventListener = {
                     student.save()
                 }
 
-                ctx.reply("سوال شما ثبت گردید و دراسرع وقت توسط مشاوران پاسخ داده خواهد شد.")
+                ctx.reply(QUESTIONREGISTERED)
             } else {
                 StudentFile.Fullname = ctx.session.stateData.Fullname
                 StudentFile.Field = ctx.session.stateData.Field
@@ -183,13 +208,14 @@ const EventListener = {
                 StudentFile.MessageId = messageId
                 StudentFile.MessageText = messageText
                 await StudentFile.save()
-                ctx.reply("سوال شما ثبت گردید و در اسرع وقت توسط مشاوران پاسخ داده خواهد شد.")
+                ctx.reply(QUESTIONREGISTERED)
             }
         } else next()
     }, [STATE_LIST.ANSWER]: (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.message) {
-            ctx.telegram.sendVoice(-1001704168213, ctx.message.voice.file_id, {caption: question[0]})
+            const ChannelChatId = -1001704168213
+            ctx.telegram.sendVoice(ChannelChatId, ctx.message.voice.file_id, {caption: question[0]})
         } else next()
     }
 }

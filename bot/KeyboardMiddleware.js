@@ -1,5 +1,18 @@
 const {MAIN_BUTTONS_TEXT, answerBtn} = require("./ButtonManager")
-const {adminInfoMessage, adviserInfoMessage, studentInfoMessage} = require("./MessageHandler")
+const {
+    adminInfoMessage,
+    adviserInfoMessage,
+    studentInfoMessage,
+    ENTERADMINUSERNAME ,
+    ENTERADVISERUSERNAME,
+    ENTERMESSAGE,
+    ENTERFULLNAME,
+    ADMINSLIST,
+    ADVISERSLIST,
+    ADVISERSQUESTIONSLIST,
+    STUDENTSQUESTIONSLIST,
+    TIP,
+} = require("./MessageHandler")
 const {STATE_LIST} = require("./SessionMiddleware")
 
 const Admin = require("../Admin")
@@ -19,7 +32,7 @@ module.exports = (ctx, next) => {
 EventListener = {
     [MAIN_BUTTONS_TEXT.ADDADMIN]: async (ctx) => {
         ctx.session.state = STATE_LIST.ADDADMIN
-        ctx.reply(" لطفا یوزر نیم مدیر جدید را وارد نمایید : ")
+        ctx.reply(ENTERADMINUSERNAME)
     },
     [MAIN_BUTTONS_TEXT.ADMINSLIST]: async (ctx) => {
         const AdminsData = await Admin.find()
@@ -29,12 +42,12 @@ EventListener = {
             let admin = await Admin.findOne({_id: AdminsId[item]})
             AdminsList += adminInfoMessage(admin)
         }
-        ctx.reply("لیست مدیران")
+        ctx.reply(ADMINSLIST)
         ctx.reply(AdminsList)
     },
     [MAIN_BUTTONS_TEXT.ADDADVISER]: async (ctx) => {
         ctx.session.state = STATE_LIST.ADDADVISER
-        ctx.reply(" لطفا یوزرنیم مشاور جدید را وارد نمایید : ")
+        ctx.reply(ENTERADVISERUSERNAME)
     },
     [MAIN_BUTTONS_TEXT.ADVISERSLIST]: async (ctx) => {
         const AdvisersData = await Adviser.find()
@@ -44,26 +57,26 @@ EventListener = {
             let adviser = await Adviser.findOne({_id: AdvisersId[item]})
             AdvisersList += adviserInfoMessage(adviser)
         }
-        ctx.reply("لیست مشاوران")
+        ctx.reply(ADVISERSLIST)
         ctx.reply(AdvisersList)
     },
     [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADVISERS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORADVISERS
-        ctx.reply("لطفا پیام خود را وارد نمایید : ")
+        ctx.reply(ENTERMESSAGE)
     }, [MAIN_BUTTONS_TEXT.ASKQUESTIONS]: async (ctx) => {
         ctx.session.state = STATE_LIST.GETSTUDENTFULLNAME
-        ctx.reply("دانش آموز گرامی جهت پرسش از مشاورین باید مشخصات خواسته شده را وارد نمایید")
-        ctx.reply("لطفا نام و نام خانوادگی خود را وارد نمایید:")
+        ctx.reply(TIP)
+        ctx.reply(ENTERFULLNAME)
         // ctx.session.stateData = undefined
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORSTUDENTS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORSTUDENTS
-        ctx.reply("لطفا پیام خود را وارد نمایید:")
+        ctx.reply(ENTERMESSAGE)
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADMINS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORADMINS
-        ctx.reply("لطفا پیام خود را وارد نمایید:")
+        ctx.reply(ENTERMESSAGE)
     },
     [MAIN_BUTTONS_TEXT.QUESTIONSLISTFORADVISERS]: async (ctx) => {
-        ctx.reply("لیست سوالات دانش آموزان")
+        ctx.reply(STUDENTSQUESTIONSLIST)
         const StudentsData = await Student.find()
         const StudentsIds = StudentsData.map(element => element.id)
         for (item in StudentsIds) {
@@ -73,7 +86,7 @@ EventListener = {
         }
     },
     [MAIN_BUTTONS_TEXT.QUESTIONSLIST]: async (ctx) => {
-        ctx.reply("لیست سوالات مشاوران")
+        ctx.reply(ADVISERSQUESTIONSLIST)
         const AdvisersData = await Adviser.find()
         const AdvisersIds = AdvisersData.map(element => element.id)
         for (item in AdvisersIds) {

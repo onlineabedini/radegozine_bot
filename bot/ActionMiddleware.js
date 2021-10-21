@@ -1,4 +1,7 @@
 const {STATE_LIST, sendQuestionText} = require("./SessionMiddleware")
+const {
+    ENTERANSWER
+} = require("./MessageHandler")
 let Question
 
 const ActionMap = {
@@ -26,7 +29,7 @@ const EventListener = {
         Question = studentQuestion.split('*')[1]
         sendQuestionText(Question)
         ctx.session.state = STATE_LIST.ANSWER
-        ctx.reply("لطفا پاسخ خود را بصورت ویس وارد نمایید")
+        ctx.reply(ENTERANSWER)
     }
 }
 

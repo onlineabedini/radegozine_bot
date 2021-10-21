@@ -5,6 +5,11 @@ const KeyboardMiddleware = require('./KeyboardMiddleware')
 const ActionMiddleware = require('./ActionMiddleware')
 //const Middleware = require("./Middleware")
 const {AdminsStartBtns, AdvisersStartBtns, StudentsStartBtns} = require("./ButtonManager")
+const {
+    STARTMESSAGEFORADMIN,
+    STARTMESSAGEFORADVISER,
+    STARTMESSAGEFORSTUDENT,
+} = require("./MessageHandler")
 const Admin = require("../Admin")
 const Adviser = require("../Adviser")
 const User = require("../User")
@@ -27,13 +32,14 @@ async function startBot() {
             const AdminUsernames = AdminData.map(element => element.Username)
             const AdviserData = await Adviser.find()
             const AdviserUsernames = AdviserData.map(element => element.Username)
+            // ALINPDEV IS THE MAIN ADMIN
             if (ctx.message.from.username === 'ALINPDEV' || AdminUsernames.includes(ctx.message.from.username)) {
-                ctx.reply("مدیر", AdminsStartBtns)
+                ctx.reply(STARTMESSAGEFORADMIN, AdminsStartBtns)
             } else if (AdviserUsernames.includes(ctx.message.from.username)) {
                 let adviser = await Adviser.findOne({Username: ctx.message.from.username})
                 adviser.ChatId = ctx.message.chat.id
                 await adviser.save();
-                ctx.reply("مشاور", AdvisersStartBtns)
+                ctx.reply(STARTMESSAGEFORADVISER, AdvisersStartBtns)
             } else {
                 const UserData = await User.findOne({ChatId: ctx.message.chat.id})
                 if (!UserData) {
@@ -44,8 +50,8 @@ async function startBot() {
                         })
                         user.save()
                     }
-                    ctx.reply("دانش آموز", StudentsStartBtns)
-                } else ctx.reply("دانش آموز", StudentsStartBtns)
+                    ctx.reply(STARTMESSAGEFORSTUDENT, StudentsStartBtns)
+                } else ctx.reply(STARTMESSAGEFORSTUDENT, StudentsStartBtns)
 
             }
         }
