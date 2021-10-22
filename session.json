@@ -4,16 +4,11 @@
       "id": "2075704306:2075704306",
       "data": {
         "stateData": {
-          "Fullname": "طرح ها",
-          "Field": "طرح ها",
+          "Fullname": "علی نظرپور",
+          "Field": "تجربی",
           "Grade": "دوازدهم"
-        },
-        "state": "getstudentfullname"
+        }
       }
-    },
-    {
-      "id": "1760285743:1760285743",
-      "data": {}
     }
   ]
 }

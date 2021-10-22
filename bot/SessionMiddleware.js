@@ -4,6 +4,14 @@ const Student = require("../Student")
 const Users = require("../User")
 let question
 const {
+    MAIN_BUTTONS_TEXT,
+    answerBtn,
+    cancelBtn,
+    AdminsStartBtns,
+    AdvisersStartBtns,
+    StudentsStartBtns,
+} = require("./ButtonManager")
+const {
     ENTERADMINFULLNAME,
     ENTERADVISERFULLNAME,
     ENTERFIELD,
@@ -51,7 +59,7 @@ module.exports.sendQuestionText = (Question) => {
 const EventListener = {
     [STATE_LIST.ADDADMIN]: (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const AdminUsername = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, AdminUsername}
             ctx.session.state = STATE_LIST.GETADMINFULLNAME
@@ -59,15 +67,15 @@ const EventListener = {
         } else next()
     }, [STATE_LIST.GETADMINFULLNAME]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const AdminFullname = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, AdminFullname}
             const AdminData = await Admin.findOne({Username: ctx.session.stateData.AdminUsername})
             if (!AdminData) {
                 AddNewAdmin()
-                ctx.reply(ADMINCONFIRMMESSAGE)
+                ctx.reply(ADMINCONFIRMMESSAGE, AdminsStartBtns)
             } else {
-                ctx.reply(DUPLICATEADMIN)
+                ctx.reply(DUPLICATEADMIN, AdminsStartBtns)
             }
 
             function AddNewAdmin() {
@@ -83,7 +91,7 @@ const EventListener = {
     },
     [STATE_LIST.ADDADVISER]: (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const AdviserUsername = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, AdviserUsername}
             ctx.session.state = STATE_LIST.GETADVISERFULLNAME
@@ -91,16 +99,16 @@ const EventListener = {
         } else next()
     }, [STATE_LIST.GETADVISERFULLNAME]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const AdviserFullname = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, AdviserFullname}
             const AdviserData = await Adviser.findOne({Username: ctx.session.stateData.AdviserUsername})
 
             if (!AdviserData) {
                 AddNewAdviser()
-                ctx.reply(ADVISERCONFIRMMESSAGE)
+                ctx.reply(ADVISERCONFIRMMESSAGE, AdminsStartBtns)
             } else {
-                ctx.reply(DUPLICATEADVISER)
+                ctx.reply(DUPLICATEADVISER, AdminsStartBtns)
             }
 
             function AddNewAdviser() {
@@ -118,28 +126,34 @@ const EventListener = {
         ctx.session.state = undefined
         const AdvisersData = await Adviser.find()
         const AdvisersChatIds = AdvisersData.map(element => element.ChatId)
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const MessageId = ctx.message.message_id
             for (item in AdvisersChatIds) {
                 await ctx.telegram.forwardMessage(AdvisersChatIds[item], ctx.message.chat.id, MessageId)
             }
-            ctx.reply(SENDMESSAGEFORADVISERSWASSUCCESSFUL)
+            ctx.reply(SENDMESSAGEFORADVISERSWASSUCCESSFUL, AdminsStartBtns)
         } else next()
     },
     [STATE_LIST.SENDMESSAGEFORSTUDENTS]: async (ctx, next) => {
         ctx.session.state = undefined
         const UserData = await Users.find()
         const UsersChatIds = UserData.map(element => element.ChatId)
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const MessageId = ctx.message.message_id
             for (item in UsersChatIds) {
                 await ctx.telegram.copyMessage(UsersChatIds[item], ctx.message.chat.id, MessageId)
             }
-            ctx.reply(SENDMESSAGEFORSTUDENTSWASSUCCESSFUL)
+
+            const admin = await Admin.findOne({Username: ctx.message.chat.username})
+            if (ctx.message.chat.username === 'ALINPDEV' || admin) {
+                ctx.reply(SENDMESSAGEFORSTUDENTSWASSUCCESSFUL, AdminsStartBtns)
+            } else {
+                ctx.reply(SENDMESSAGEFORSTUDENTSWASSUCCESSFUL, AdvisersStartBtns)
+            }
         } else next()
     }, [STATE_LIST.SENDMESSAGEFORADMINS]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const chatId = ctx.message.chat.id
             const username = ctx.message.chat.username
             const messageId = ctx.message.message_id
@@ -147,11 +161,11 @@ const EventListener = {
             adviser.Username = username
             adviser.MessageId = messageId
             adviser.save()
-            ctx.reply(SENDMESSAGEWASSUCCESSFUL)
+            ctx.reply(SENDMESSAGEWASSUCCESSFUL , AdvisersStartBtns)
         } else next()
     }, [STATE_LIST.GETSTUDENTFULLNAME]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const Fullname = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, Fullname}
             ctx.session.state = STATE_LIST.GETSTUDENTFIELD
@@ -160,7 +174,7 @@ const EventListener = {
     }
     , [STATE_LIST.GETSTUDENTFIELD]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const Field = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, Field}
             ctx.session.state = STATE_LIST.GETSTUDENTGRADE
@@ -168,7 +182,7 @@ const EventListener = {
         } else next()
     }, [STATE_LIST.GETSTUDENTGRADE]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const Grade = ctx.message.text
             ctx.session.stateData = {...ctx.session.stateData, Grade}
             ctx.session.state = STATE_LIST.ASKQUESTION
@@ -176,7 +190,7 @@ const EventListener = {
         } else next()
     }, [STATE_LIST.ASKQUESTION]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message) {
+        if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
             const messageText = ctx.message.text
             const messageId = ctx.message.message_id
             const userChatId = ctx.message.chat.id
@@ -185,7 +199,6 @@ const EventListener = {
             if (!StudentFile) {
                 const chatId = ctx.message.from.id
                 AddNewStudent()
-
                 function AddNewStudent() {
                     const student = new Student({
                         ChatId: chatId,
@@ -198,8 +211,8 @@ const EventListener = {
                     })
                     student.save()
                 }
-
-                ctx.reply(QUESTIONREGISTERED)
+                ctx.session.stateData = undefined
+                ctx.reply(QUESTIONREGISTERED, StudentsStartBtns)
             } else {
                 StudentFile.Fullname = ctx.session.stateData.Fullname
                 StudentFile.Field = ctx.session.stateData.Field
@@ -208,7 +221,8 @@ const EventListener = {
                 StudentFile.MessageId = messageId
                 StudentFile.MessageText = messageText
                 await StudentFile.save()
-                ctx.reply(QUESTIONREGISTERED)
+                ctx.session.stateData = undefined
+                ctx.reply(QUESTIONREGISTERED, StudentsStartBtns)
             }
         } else next()
     }, [STATE_LIST.ANSWER]: (ctx, next) => {

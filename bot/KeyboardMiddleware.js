@@ -1,4 +1,11 @@
-const {MAIN_BUTTONS_TEXT, answerBtn} = require("./ButtonManager")
+const {
+    MAIN_BUTTONS_TEXT,
+    answerBtn ,
+    cancelBtn,
+    AdminsStartBtns,
+    AdvisersStartBtns,
+    StudentsStartBtns,
+} = require("./ButtonManager")
 const {
     adminInfoMessage,
     adviserInfoMessage,
@@ -18,6 +25,7 @@ const {STATE_LIST} = require("./SessionMiddleware")
 const Admin = require("../Admin")
 const Adviser = require("../Adviser")
 const Student = require("../Student")
+const User = require("../User")
 
 module.exports = (ctx, next) => {
     if (!ctx.message)
@@ -32,7 +40,7 @@ module.exports = (ctx, next) => {
 EventListener = {
     [MAIN_BUTTONS_TEXT.ADDADMIN]: async (ctx) => {
         ctx.session.state = STATE_LIST.ADDADMIN
-        ctx.reply(ENTERADMINUSERNAME)
+        ctx.reply(ENTERADMINUSERNAME , cancelBtn)
     },
     [MAIN_BUTTONS_TEXT.ADMINSLIST]: async (ctx) => {
         const AdminsData = await Admin.find()
@@ -47,7 +55,7 @@ EventListener = {
     },
     [MAIN_BUTTONS_TEXT.ADDADVISER]: async (ctx) => {
         ctx.session.state = STATE_LIST.ADDADVISER
-        ctx.reply(ENTERADVISERUSERNAME)
+        ctx.reply(ENTERADVISERUSERNAME , cancelBtn)
     },
     [MAIN_BUTTONS_TEXT.ADVISERSLIST]: async (ctx) => {
         const AdvisersData = await Adviser.find()
@@ -62,18 +70,18 @@ EventListener = {
     },
     [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADVISERS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORADVISERS
-        ctx.reply(ENTERMESSAGE)
+        ctx.reply(ENTERMESSAGE, cancelBtn)
     }, [MAIN_BUTTONS_TEXT.ASKQUESTIONS]: async (ctx) => {
         ctx.session.state = STATE_LIST.GETSTUDENTFULLNAME
-        ctx.reply(TIP)
+        ctx.reply(TIP, cancelBtn)
         ctx.reply(ENTERFULLNAME)
         // ctx.session.stateData = undefined
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORSTUDENTS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORSTUDENTS
-        ctx.reply(ENTERMESSAGE)
+        ctx.reply(ENTERMESSAGE, cancelBtn)
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADMINS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORADMINS
-        ctx.reply(ENTERMESSAGE)
+        ctx.reply(ENTERMESSAGE, cancelBtn)
     },
     [MAIN_BUTTONS_TEXT.QUESTIONSLISTFORADVISERS]: async (ctx) => {
         ctx.reply(STUDENTSQUESTIONSLIST)
@@ -81,7 +89,7 @@ EventListener = {
         const StudentsIds = StudentsData.map(element => element.id)
         for (item in StudentsIds) {
             let student = await Student.findOne({_id: StudentsIds[item]})
-            await ctx.telegram.sendMessage(ctx.message.chat.id, studentInfoMessage(student), answerBtn)
+            await ctx.telegram.sendMessage(ctx.message.chat.id , studentInfoMessage(student), answerBtn)
             //await Student.findOneAndDelete({ChatId: student.ChatId})
         }
     },
@@ -97,5 +105,18 @@ EventListener = {
 
     }, [MAIN_BUTTONS_TEXT.BOTDEVELOPER]: async (ctx) => {
         ctx.reply("این بات توسط  تیم آی آر نود توسعه داده شده است")
+    },
+    [MAIN_BUTTONS_TEXT.CANCEL]: async (ctx) => {
+        ctx.session.state = undefined
+        ctx.session.stateData = undefined
+        const admin = await Admin.findOne({Username : ctx.message.chat.username})
+        const adviser = await Adviser.findOne({Username : ctx.message.chat.username})
+        if (admin || ctx.message.from.username === 'ALINPDEV'){
+            ctx.reply("درخواست شما لغو شد",AdminsStartBtns)
+        } else if (adviser){
+            ctx.reply("درخواست شما لغو شد",AdvisersStartBtns)
+        } else {
+            ctx.reply("درخواست شما لغو شد",StudentsStartBtns)
+        }
     },
 }

@@ -11,7 +11,8 @@ MAIN_BUTTONS_TEXT = {
     ASKQUESTIONS: "سوال از مشاورین",
     PLANS: "طرح ها",
     CONTACTWITHADMIN: "ارتباط با مدیر",
-    BOTDEVELOPER: "طراح بات"
+    BOTDEVELOPER: "طراح بات",
+    CANCEL:"لغو"
 }
 
 const AdminsStartBtns = {
@@ -83,10 +84,20 @@ const answerBtn = {
     },
 }
 
+const cancelBtn = {
+    reply_markup: {
+        resize_keyboard: true,
+        keyboard: [
+            [{text: MAIN_BUTTONS_TEXT.CANCEL}],
+        ]
+    },
+}
+
 module.exports = {
     MAIN_BUTTONS_TEXT,
     AdminsStartBtns,
     AdvisersStartBtns,
     StudentsStartBtns,
-    answerBtn
+    answerBtn ,
+    cancelBtn
 }
