@@ -33,7 +33,6 @@ async function startBot() {
             const AdminsUsernames = AdminData.map(element => element.Username)
             const AdviserData = await Adviser.find()
             const AdvisersUsernames = AdviserData.map(element => element.Username)
-            // ALINPDEV IS THE MAIN ADMIN
             if (ctx.message.from.username === config.get("MainAdminUsername") || AdminsUsernames.includes(ctx.message.from.username)) {
                 await ctx.reply(STARTMESSAGEFORADMIN, AdminsStartBtns)
             } else if (AdvisersUsernames.includes(ctx.message.from.username)) {
