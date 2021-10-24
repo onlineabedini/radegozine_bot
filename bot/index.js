@@ -3,7 +3,7 @@ const LocalSession = require('telegraf-session-local')
 const SessionMiddleware = require('./SessionMiddleware')
 const KeyboardMiddleware = require('./KeyboardMiddleware')
 const ActionMiddleware = require('./ActionMiddleware')
-//const Middleware = require("./Middleware")
+const Middleware = require("./Middleware")
 const {AdminsStartBtns, AdvisersStartBtns, StudentsStartBtns} = require("./ButtonManager")
 const {
     STARTMESSAGEFORADMIN,
@@ -13,6 +13,7 @@ const {
 const Admin = require("../Admin")
 const Adviser = require("../Adviser")
 const User = require("../User")
+const config = require("config")
 let bot
 
 async function startBot() {
@@ -29,17 +30,17 @@ async function startBot() {
         RoleSelector()
         async function RoleSelector() {
             const AdminData = await Admin.find()
-            const AdminUsernames = AdminData.map(element => element.Username)
+            const AdminsUsernames = AdminData.map(element => element.Username)
             const AdviserData = await Adviser.find()
-            const AdviserUsernames = AdviserData.map(element => element.Username)
+            const AdvisersUsernames = AdviserData.map(element => element.Username)
             // ALINPDEV IS THE MAIN ADMIN
-            if (ctx.message.from.username === 'ALINPDEV' || AdminUsernames.includes(ctx.message.from.username)) {
-                ctx.reply(STARTMESSAGEFORADMIN, AdminsStartBtns)
-            } else if (AdviserUsernames.includes(ctx.message.from.username)) {
+            if (ctx.message.from.username === config.get("MainAdminUsername") || AdminsUsernames.includes(ctx.message.from.username)) {
+                await ctx.reply(STARTMESSAGEFORADMIN, AdminsStartBtns)
+            } else if (AdvisersUsernames.includes(ctx.message.from.username)) {
                 let adviser = await Adviser.findOne({Username: ctx.message.from.username})
                 adviser.ChatId = ctx.message.chat.id
                 await adviser.save();
-                ctx.reply(STARTMESSAGEFORADVISER, AdvisersStartBtns)
+                await ctx.reply(STARTMESSAGEFORADVISER, AdvisersStartBtns)
             } else {
                 const UserData = await User.findOne({ChatId: ctx.message.chat.id})
                 if (!UserData) {
@@ -50,8 +51,8 @@ async function startBot() {
                         })
                         user.save()
                     }
-                    ctx.reply(STARTMESSAGEFORSTUDENT, StudentsStartBtns)
-                } else ctx.reply(STARTMESSAGEFORSTUDENT, StudentsStartBtns)
+                    await ctx.reply(STARTMESSAGEFORSTUDENT, StudentsStartBtns)
+                } else await ctx.reply(STARTMESSAGEFORSTUDENT, StudentsStartBtns)
 
             }
         }

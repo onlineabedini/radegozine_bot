@@ -7,6 +7,5 @@ const schema = new mongoose.Schema({
     Grade: String,
     MessageId : Number,
     MessageText : String,
-    PhoneNumber: String,
 })
 module.exports = mongoose.model("Student", schema)

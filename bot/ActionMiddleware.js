@@ -2,7 +2,6 @@ const {STATE_LIST, sendQuestionText} = require("./SessionMiddleware")
 const {
     ENTERANSWER
 } = require("./MessageHandler")
-let Question
 
 const ActionMap = {
     ANSWER: /^ANSWER/,
@@ -26,10 +25,10 @@ module.exports = (ctx, next) => {
 const EventListener = {
     ANSWER: async (ctx) => {
         const studentQuestion = ctx.update.callback_query.message.text
-        Question = studentQuestion.split('*')[1]
-        sendQuestionText(Question)
+        let QuestionText = studentQuestion.split('*')[1]
+        sendQuestionText(QuestionText)
         ctx.session.state = STATE_LIST.ANSWER
-        ctx.reply(ENTERANSWER)
+        await ctx.reply(ENTERANSWER)
     }
 }
 
