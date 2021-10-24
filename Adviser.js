@@ -3,6 +3,6 @@ const schema = new mongoose.Schema({
     ChatId : Number,
     Username : String,
     Fullname : String,
-    MessageId : Number,
+    MessageId : [],
 })
 module.exports = mongoose.model("Adviser", schema)

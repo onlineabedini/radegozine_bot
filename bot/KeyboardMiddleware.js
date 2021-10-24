@@ -106,15 +106,14 @@ EventListener = {
         await ctx.reply(SELECTANITEM, manageAdminsBtns)
     }, [MAIN_BUTTONS_TEXT.MANAGEADVISERS]: async (ctx) => {
         await ctx.reply(SELECTANITEM, manageAdvisersBtns)
-    },
-    [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADVISERS]: async (ctx) => {
+    }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADMINS]: async (ctx) => {
+        ctx.session.state = STATE_LIST.SENDMESSAGEFORADMINS
+        await ctx.reply(ENTERMESSAGE, cancelBtn)
+    }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADVISERS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORADVISERS
         await ctx.reply(ENTERMESSAGE, cancelBtn)
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORSTUDENTS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORSTUDENTS
-        await ctx.reply(ENTERMESSAGE, cancelBtn)
-    }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADMINS]: async (ctx) => {
-        ctx.session.state = STATE_LIST.SENDMESSAGEFORADMINS
         await ctx.reply(ENTERMESSAGE, cancelBtn)
     }, [MAIN_BUTTONS_TEXT.ASKQUESTIONS]: async (ctx) => {
         ctx.session.state = STATE_LIST.GETSTUDENTFULLNAME
@@ -135,7 +134,7 @@ EventListener = {
             await ctx.reply(EMPTYLIST)
         }
     },
-    [MAIN_BUTTONS_TEXT.ADVISERSQUESTIONSLIST]: async (ctx, next) => {
+    [MAIN_BUTTONS_TEXT.ADVISERSQUESTIONSLIST]: async (ctx) => {
         const AdvisersData = await Adviser.find()
         const AdvisersIds = AdvisersData.map(element => element.id)
         if (AdvisersIds.length !== 0) {
@@ -144,9 +143,11 @@ EventListener = {
             for (item in AdvisersIds) {
                 let adviser = await Adviser.findOne({_id: AdvisersIds[item]})
                 let MessageId = adviser.MessageId
-                if (MessageId) {
+                if (MessageId.length !== 0) {
                     MessageIds.push(MessageId)
-                    await ctx.telegram.forwardMessage(ctx.message.chat.id, adviser.ChatId, adviser.MessageId)
+                    for (item in MessageId) {
+                        await ctx.telegram.forwardMessage(ctx.message.chat.id, adviser.ChatId, MessageId[item])
+                    }
                 } else if (MessageIds.length === 0) {
                     await ctx.reply(EMPTYLIST)
                 }

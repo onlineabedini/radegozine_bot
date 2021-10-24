@@ -238,7 +238,7 @@ const EventListener = {
             const messageId = ctx.message.message_id
             let adviser = await Adviser.findOne({ChatId: chatId})
             adviser.Username = username
-            adviser.MessageId = messageId
+            adviser.MessageId.push(messageId)
             adviser.save()
             await ctx.reply(SENDMESSAGEWASSUCCESSFUL, AdvisersStartBtns)
         } else next()
