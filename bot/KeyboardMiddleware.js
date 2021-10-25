@@ -43,6 +43,7 @@ const {STATE_LIST} = require("./SessionMiddleware")
 const Admin = require("../Admin")
 const Adviser = require("../Adviser")
 const Student = require("../Student")
+const config = require("config")
 let MessageIds
 
 module.exports = (ctx, next) => {
@@ -153,14 +154,14 @@ EventListener = {
                 }
             }
         } else {
-            await ctx.reply(NOADVISERADDED)
+            await ctx.reply(EMPTYLIST)
         }
     }, [MAIN_BUTTONS_TEXT.CANCEL]: async (ctx) => {
         ctx.session.state = undefined
         ctx.session.stateData = undefined
         const admin = await Admin.findOne({Username: ctx.message.chat.username})
         const adviser = await Adviser.findOne({Username: ctx.message.chat.username})
-        if (admin || ctx.message.from.username === 'ALINPDEV') {
+        if (admin || ctx.message.from.username === config.get("MainAdminUsername")) {
             await ctx.reply(REQUESTCANCELED, AdminsStartBtns)
         } else if (adviser) {
             await ctx.reply(REQUESTCANCELED, AdvisersStartBtns)
