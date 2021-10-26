@@ -38,6 +38,7 @@ const {
     NOADVISERADDED,
     ADMINREMOVED,
     ADVISERREMOVED,
+    voiceCaption
 } = require("./MessageHandler")
 
 
@@ -314,7 +315,7 @@ const EventListener = {
     }, [STATE_LIST.ANSWER]: async (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.message.voice) {
-            await ctx.telegram.sendVoice(config.get("ChannelChatId"), ctx.message.voice.file_id, {caption: QuestionText[0]})
+            await ctx.telegram.sendVoice(config.get("ChannelChatId"), ctx.message.voice.file_id, {caption: voiceCaption(QuestionText[0])})
             await ctx.reply(ANSWERREGISTERED)
             const student = await Student.findOne({MessageText: QuestionText[0].split(":")[1]})
             await ctx.telegram.sendMessage(student.ChatId, YOURQUESTIONHASBEENANSWERED)

@@ -39,6 +39,22 @@ module.exports.studentInfoMessage = (Student) =>`
 🔹یوزنیم دانش آموز :@${Student.Username}
 @radegozine`
 
+module.exports.voiceCaption = (QuestionText) => `
+🟢 سوالات مشاوره ای
+⁉️ ${QuestionText}
+
+
+🟢 ردگزینه
+🔵 مشاور - پشتیبانی - تدریس موفقیت کنکور
+❤️ برای مشاوره ( ۱۰۰٪  رایگان ) به ما پیام بدید 
+
+
+🌹👇 سوال خود را از طریق ربات بپرسید
+✅ @radegozineBot
+
+        @radegozine
+╰┄┅◇◇◇◇◇┅┄╯
+`
 
 module.exports.ENTERADMINUSERNAME = ` 🔹 لطفا یوزر نیم مدیر جدید را به فرم 'nemoone@' وارد نمایید : 
 🔸 توجه : در صورت اشتباه وارد نمودن یوزر نیم ، مدیر جدید قادر به بهره مندی از خدمات بات نخواهد بود. `

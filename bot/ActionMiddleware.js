@@ -1,3 +1,4 @@
+const Student = require("../Student")
 const {STATE_LIST, sendQuestionText} = require("./SessionMiddleware")
 const {
     ENTERANSWER
@@ -5,6 +6,7 @@ const {
 
 const ActionMap = {
     ANSWER: /^ANSWER/,
+    DELETE: /^DELETE/,
 }
 
 module.exports = (ctx, next) => {
@@ -29,6 +31,14 @@ const EventListener = {
         sendQuestionText(QuestionText)
         ctx.session.state = STATE_LIST.ANSWER
         await ctx.reply(ENTERANSWER)
+    },
+    DELETE: async (ctx) => {
+        const MessageId = ctx.update.callback_query.message.message_id
+        const ChatId = ctx.update.callback_query.message.chat.id
+        const studentQuestion = ctx.update.callback_query.message.text
+        let QuestionText = studentQuestion.split('*')[1].split(":")[1]
+        await Student.findOneAndDelete({MessageText: QuestionText})
+        await ctx.telegram.deleteMessage(ChatId, MessageId)
     }
 }
 

@@ -99,6 +99,7 @@ const answerBtn = {
         resize_keyboard: true,
         inline_keyboard: [
             [{text: "پاسخ به سوال", callback_data: `ANSWER`}],
+            [{text: "حذف سوال", callback_data: `DELETE`}],
         ]
     },
 }
