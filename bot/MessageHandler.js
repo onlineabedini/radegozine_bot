@@ -37,7 +37,7 @@ module.exports.studentInfoMessage = (Student) =>`
 🔹رشته ی تحصیلی :${Student.Field}
 🔹پایه ی تحصیلی :${Student.Grade}
 🔹یوزنیم دانش آموز :@${Student.Username}
-@radegozine`
+@radegozinebot`
 
 module.exports.voiceCaption = (QuestionText) => `
 🟢 سوالات مشاوره ای
@@ -91,12 +91,12 @@ module.exports.ENTERANSWER = "لطفا پاسخ خود را بصورت ویس و
 module.exports.ENTERTEXTONLY = "لطفااطلاعات خواسته شده را فقط به صورت متنی وارد نمایید❗️ "
 module.exports.TEXTMESSAGEONLY = "لطفا پیام خود را فقط به صورت متنی وارد نمایید❗️"
 module.exports.VOICEMESSAGEONLY = "لطفا پیام خود را فقط به صورت ویس وارد نمایید❗️"
-module.exports.SENDMESSAGEFORADVISERSWASSUCCESSFUL = "✅ پیام شما برای مشاوران با موفقیت ارسال شد"
-module.exports.SENDMESSAGEFORSTUDENTSWASSUCCESSFUL = "✅ پیام شما برای دانش آموزان با موفقیت ارسال شد"
-module.exports.SENDMESSAGEWASSUCCESSFUL = "✅ پیام شما با موفقیت ارسال شد"
-module.exports.QUESTIONREGISTERED = "✅ سوال شما ثبت گردید و دراسرع وقت توسط مشاوران پاسخ داده خواهد شد"
-module.exports.ANSWERREGISTERED = "✅ پاسخ شما ثبت شد و در کانال رد گزینه قرار گرفت"
-module.exports.YOURQUESTIONHASBEENANSWERED = "✅ سوال شما پاسخ داده شد و در کانال رد گزینه قرار گرفت"
+module.exports.SENDMESSAGEFORADVISERSWASSUCCESSFUL = "✅ پیام شما برای مشاوران با موفقیت ارسال شد."
+module.exports.SENDMESSAGEFORSTUDENTSWASSUCCESSFUL = "✅ پیام شما برای دانش آموزان با موفقیت ارسال شد."
+module.exports.SENDMESSAGEWASSUCCESSFUL = "✅ پیام شما با موفقیت ارسال شد."
+module.exports.QUESTIONREGISTERED = "✅ سوال شما ثبت گردید و دراسرع وقت توسط مشاوران پاسخ داده خواهد شد."
+module.exports.ANSWERREGISTERED = "✅ پاسخ شما ثبت شد و در کانال رد گزینه قرار گرفت."
+module.exports.YOURQUESTIONHASBEENANSWERED = "✅ سوال شما پاسخ داده شد و در کانال رد گزینه قرار گرفت."
 module.exports.SELECTANITEM ="لطفا از لیست زیر یک مورد را انتخاب نمایید ⬇️"
 module.exports.SEEPLANS = "برای دیدن طرح ها بر روی دکمه ی زیر کلیک کنید ⬇️"
 module.exports.CONTACTWITHADMIN = "برای ارتباط با مدیر بر روی کلید زیر کلیک کنید ⬇️"

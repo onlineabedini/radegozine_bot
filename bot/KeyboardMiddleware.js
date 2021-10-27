@@ -138,12 +138,12 @@ EventListener = {
         const AdvisersData = await Adviser.find()
         const AdvisersIds = AdvisersData.map(element => element.id)
         if (AdvisersIds.length !== 0) {
-            await ctx.reply(ADVISERSQUESTIONSLIST)
             MessageIds = []
             for (item in AdvisersIds) {
                 let adviser = await Adviser.findOne({_id: AdvisersIds[item]})
                 let MessageId = adviser.MessageId
                 if (MessageId.length !== 0) {
+                    await ctx.reply(ADVISERSQUESTIONSLIST)
                     MessageIds.push(MessageId)
                     for (item in MessageId) {
                         await ctx.telegram.forwardMessage(ctx.message.chat.id, adviser.ChatId, MessageId[item])
