@@ -182,7 +182,7 @@ EventListener = {
     }, [MAIN_BUTTONS_TEXT.CONTACTWITHADMIN]: async (ctx) => {
         await ctx.reply(CONTACTWITHADMIN, contactWithAdminBtn)
     }, [MAIN_BUTTONS_TEXT.BOTDEVELOPERS]: async (ctx) => {
-        await ctx.replyWithPhoto('AgACAgQAAxkBAAIQlmF1wVeFKcwaTksQB4fKXeP9kPJVAALhtTEbA76wU-Flir2v-ty3AQADAgADeQADIQQ', {
+        await ctx.replyWithPhoto({source:"./img/irnode.jpg"}, {
             caption: BOTDEVELOPERSCAPTION
         })
     },

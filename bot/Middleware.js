@@ -1,4 +1,3 @@
-module.exports = async (ctx, next) => {
-    console.log(ctx.message)
-    next()
+module.exports = async (ctx) => {
+    console.log(ctx)
 }
