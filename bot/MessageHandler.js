@@ -2,19 +2,19 @@ module.exports.STARTMESSAGEFORADMIN = `
 🌺 سلام مدیر گرامی به ربات رد گزینه خوش آمدید 🌺
 🔹 برای بهره مندی از خدمات این بات لطفا از منوی زیر یک گزینه را به دلخواه
         انتخاب نمایید:
- @radegozinebot
+ @radegozine_bot
  `
 module.exports.STARTMESSAGEFORADVISER = `
 🌺 سلام مشاور گرامی به ربات رد گزینه خوش آمدید 🌺
 🔹 برای بهره مندی از خدمات این بات لطفا از منوی زیر یک گزینه را به دلخواه
         انتخاب نمایید:
- @radegozinebot
+ @radegozine_bot
  `
 module.exports.STARTMESSAGEFORSTUDENT = `
 🌺 سلام دانش آموز گرامی به ربات رد گزینه خوش آمدید 🌺
 🔹 برای بهره مندی از خدمات این بات لطفا از منوی زیر یک گزینه را به دلخواه
         انتخاب نمایید:
- @radegozinebot
+ @radegozine_bot
  `
 module.exports.adminInfoMessage = (admin) => `
 🔹یوزرنیم : @${admin.Username}
@@ -30,14 +30,14 @@ module.exports.adviserInfoMessage = (adviser) => `
                 〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️
 
 `
-module.exports.studentInfoMessage = (Student) =>`
+module.exports.studentInfoMessage = (Student) => `
 *سوال :${Student.MessageText}*
 👨‍🎓مشخصات دانش آموز :
 🔹نام و نام خانوادگی :${Student.Fullname}
 🔹رشته ی تحصیلی :${Student.Field}
 🔹پایه ی تحصیلی :${Student.Grade}
 🔹یوزنیم دانش آموز :@${Student.Username}
-@radegozinebot`
+@radegozine_bot`
 
 module.exports.voiceCaption = (QuestionText) => `
 🟢 سوالات مشاوره ای
@@ -50,7 +50,7 @@ module.exports.voiceCaption = (QuestionText) => `
 
 
 🌹👇 سوال خود را از طریق ربات بپرسید
-✅ @radegozineBot
+✅ @radegozine_bot
 
         @radegozine
 ╰┄┅◇◇◇◇◇┅┄╯
@@ -72,11 +72,11 @@ module.exports.ADMINREMOVED = "✅ ادمین با موفقیت حذف شد"
 module.exports.ADVISERREMOVED = "✅ مشاور با موفقیت حذف شد"
 module.exports.DUPLICATEADMIN = "این مدیر قبلا ثبت شده است❗️ "
 module.exports.DUPLICATEADVISER = "این مشاور قبلا ثبت شده است❗️ "
-module.exports.ADMINNOTADD="مدیری افزوده نشده است❗️"
-module.exports.NOADVISERADDED="مشاوری افزوده نشده است❗️"
-module.exports.ADMINNOTFOUND ="مدیری یافت نشد❗️"
-module.exports.ADVISERNOTFOUND ="مشاوری یافت نشد❗️"
-module.exports.STUDENTNOTFOUND ="دانش آموزی یافت نشد❗️"
+module.exports.ADMINNOTADD = "مدیری افزوده نشده است❗️"
+module.exports.NOADVISERADDED = "مشاوری افزوده نشده است❗️"
+module.exports.ADMINNOTFOUND = "مدیری یافت نشد❗️"
+module.exports.ADVISERNOTFOUND = "مشاوری یافت نشد❗️"
+module.exports.STUDENTNOTFOUND = "دانش آموزی یافت نشد❗️"
 module.exports.ADMINSLIST = "🔻 لیست مدیران 🔻"
 module.exports.ADVISERSLIST = "🔻 لیست مشاوران 🔻"
 module.exports.ADVISERSQUESTIONSLIST = "🔻 لیست پیام های مشاوران 🔻"
@@ -97,7 +97,7 @@ module.exports.SENDMESSAGEWASSUCCESSFUL = "✅ پیام شما با موفقیت
 module.exports.QUESTIONREGISTERED = "✅ سوال شما ثبت گردید و دراسرع وقت توسط مشاوران پاسخ داده خواهد شد."
 module.exports.ANSWERREGISTERED = "✅ پاسخ شما ثبت شد و در کانال رد گزینه قرار گرفت."
 module.exports.YOURQUESTIONHASBEENANSWERED = "✅ سوال شما پاسخ داده شد و در کانال رد گزینه قرار گرفت."
-module.exports.SELECTANITEM ="لطفا از لیست زیر یک مورد را انتخاب نمایید ⬇️"
+module.exports.SELECTANITEM = "لطفا از لیست زیر یک مورد را انتخاب نمایید ⬇️"
 module.exports.SEEPLANS = "برای دیدن طرح ها بر روی دکمه ی زیر کلیک کنید ⬇️"
 module.exports.CONTACTWITHADMIN = "برای ارتباط با مدیر بر روی کلید زیر کلیک کنید ⬇️"
 module.exports.REQUESTCANCELED = "❎ درخواست شما لغو شد ❎"
@@ -119,6 +119,3 @@ module.exports.BOTDEVELOPERSCAPTION = `🌹✅  تیم توسعه دهندگان
 ▫️ ir - node
  (https://t.me/ir_node)🔸 irnode.com
 🔹 @onlineabedini  👈  ارتباط با ما ~~`
-
-
-
