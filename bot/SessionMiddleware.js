@@ -38,9 +38,10 @@ const {
     NOADVISERADDED,
     ADMINREMOVED,
     ADVISERREMOVED,
-    voiceCaption
+    voiceCaption,
+    SOMETHINGWENTWORNG,
+    THEQUESTIONWASANSWERED
 } = require("./MessageHandler")
-
 
 const STATE_LIST = {
     ADDADMIN: "addadmin",
@@ -85,7 +86,7 @@ const EventListener = {
                 ctx.session.state = STATE_LIST.GETADMINFULLNAME
                 await ctx.reply(ENTERADMINFULLNAME)
             } else {
-                await ctx.reply(ENTERTEXTONLY , manageAdminsBtns)
+                await ctx.reply(ENTERTEXTONLY, manageAdminsBtns)
             }
         } else next()
     }, [STATE_LIST.REMOVEADMIN]: async (ctx, next) => {
@@ -99,7 +100,7 @@ const EventListener = {
                     await Admin.findOneAndDelete({Username: AdminUsername})
                     await ctx.reply(ADMINREMOVED, manageAdminsBtns)
                 } else {
-                    await ctx.reply(ADMINNOTFOUND , manageAdminsBtns)
+                    await ctx.reply(ADMINNOTFOUND, manageAdminsBtns)
                 }
             } else {
                 await ctx.reply(ENTERTEXTONLY, manageAdminsBtns)
@@ -212,7 +213,7 @@ const EventListener = {
                 }
                 await ctx.reply(SENDMESSAGEFORADVISERSWASSUCCESSFUL, AdminsStartBtns)
             } else {
-                await ctx.reply(NOADVISERADDED , AdminsStartBtns)
+                await ctx.reply(NOADVISERADDED, AdminsStartBtns)
             }
         } else next()
     },
@@ -291,6 +292,7 @@ const EventListener = {
                 const messageId = ctx.message.message_id
                 const messageText = ctx.message.text
                 AddNewStudent()
+
                 function AddNewStudent() {
                     const student = new Student({
                         ChatId: chatId,
@@ -314,12 +316,21 @@ const EventListener = {
         } else next()
     }, [STATE_LIST.ANSWER]: async (ctx, next) => {
         ctx.session.state = undefined
-        if (ctx.message.voice) {
-            await ctx.telegram.sendVoice(config.get("ChannelChatId"), ctx.message.voice.file_id, {caption: voiceCaption(QuestionText[0])})
-            await ctx.reply(ANSWERREGISTERED)
+        if (ctx.update.callback_query?.data && ctx.update.callback_query.data !== "CANCEL") {
+            ctx.reply(SOMETHINGWENTWORNG)
+        } else if (ctx.update.callback_query?.data === "CANCEL") {
+            await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
+        } else if (ctx.message?.voice) {
             const student = await Student.findOne({MessageText: QuestionText[0].split(":")[1]})
-            await ctx.telegram.sendMessage(student.ChatId, YOURQUESTIONHASBEENANSWERED)
-            await Student.findOneAndDelete({MessageText: QuestionText[0].split(":")[1]})
+            if (student) {
+                await ctx.telegram.sendVoice(config.get("ChannelChatId"), ctx.message.voice.file_id, {caption: voiceCaption(QuestionText[0])})
+                await ctx.reply(ANSWERREGISTERED)
+                await ctx.telegram.sendMessage(student.ChatId, YOURQUESTIONHASBEENANSWERED)
+                await Student.findOneAndDelete({MessageText: QuestionText[0].split(":")[1]})
+            } else {
+                await ctx.telegram.deleteMessage(ctx.update.message.chat.id, ctx.update.message.message_id)
+                ctx.reply(THEQUESTIONWASANSWERED)
+            }
         } else {
             await ctx.reply(VOICEMESSAGEONLY)
             next()

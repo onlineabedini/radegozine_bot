@@ -65,6 +65,7 @@ EventListener = {
         await ctx.reply(ENTERADMINUSERNAME, removeAdminCancelBtn)
     },
     [MAIN_BUTTONS_TEXT.ADMINSLIST]: async (ctx) => {
+        ctx.session.state = undefined
         const AdminsData = await Admin.find()
         const AdminsId = AdminsData.map(element => element.id)
         if (AdminsId.length !== 0) {
@@ -88,6 +89,7 @@ EventListener = {
         await ctx.reply(ENTERADVISERUSERNAME, removeAdviserCancelBtn)
     },
     [MAIN_BUTTONS_TEXT.ADVISERSLIST]: async (ctx) => {
+        ctx.session.state = undefined
         const AdvisersData = await Adviser.find()
         const AdvisersId = AdvisersData.map(element => element.id)
         if (AdvisersId.length !== 0) {
@@ -103,8 +105,10 @@ EventListener = {
         }
 
     }, [MAIN_BUTTONS_TEXT.MANAGEADMINS]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(SELECTANITEM, manageAdminsBtns)
     }, [MAIN_BUTTONS_TEXT.MANAGEADVISERS]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(SELECTANITEM, manageAdvisersBtns)
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADMINS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORADMINS
@@ -122,6 +126,7 @@ EventListener = {
         // ctx.session.stateData = undefined
     },
     [MAIN_BUTTONS_TEXT.STUDENTSQUESTIONSLIST]: async (ctx) => {
+        ctx.session.state = undefined
         const StudentsData = await Student.find()
         const StudentsIds = StudentsData.map(element => element.id)
         if (StudentsIds.length !== 0) {
@@ -135,6 +140,7 @@ EventListener = {
         }
     },
     [MAIN_BUTTONS_TEXT.ADVISERSQUESTIONSLIST]: async (ctx) => {
+        ctx.session.state = undefined
         const AdvisersData = await Adviser.find()
         const AdvisersIds = AdvisersData.map(element => element.id)
         if (AdvisersIds.length !== 0) {
@@ -168,21 +174,29 @@ EventListener = {
             await ctx.reply(REQUESTCANCELED, StudentsStartBtns)
         }
     }, [MAIN_BUTTONS_TEXT.ADDADMINCANCEL]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(REQUESTCANCELED, manageAdminsBtns)
     }, [MAIN_BUTTONS_TEXT.REMOVEADMINCANCEL]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(REQUESTCANCELED, manageAdminsBtns)
     }, [MAIN_BUTTONS_TEXT.ADDADVISERCANCEL]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(REQUESTCANCELED, manageAdvisersBtns)
     }, [MAIN_BUTTONS_TEXT.REMOVEADVISERCANCEL]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(REQUESTCANCELED, manageAdvisersBtns)
     }, [MAIN_BUTTONS_TEXT.BACK]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(SELECTANITEM, AdminsStartBtns)
     }, [MAIN_BUTTONS_TEXT.PLANS]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(SEEPLANS, plansBtn)
     }, [MAIN_BUTTONS_TEXT.CONTACTWITHADMIN]: async (ctx) => {
+        ctx.session.state = undefined
         await ctx.reply(CONTACTWITHADMIN, contactWithAdminBtn)
     }, [MAIN_BUTTONS_TEXT.BOTDEVELOPERS]: async (ctx) => {
-        await ctx.replyWithPhoto({source:"./img/irnode.jpg"}, {
+        ctx.session.state = undefined
+        await ctx.replyWithPhoto({source: "./img/irnode.jpg"}, {
             caption: BOTDEVELOPERSCAPTION
         })
     },

@@ -1,13 +1,23 @@
 const Student = require("../Student")
 const {STATE_LIST, sendQuestionText} = require("./SessionMiddleware")
+const {confidenceBtn, cancelAdviserAnswerBtn} = require("./ButtonManager")
 const {
-    ENTERANSWER
+    ENTERANSWER,
+    DELETEMESSAGEWASSUCCESSFUL,
+    DELETEMESSAGEREQUESTCANCELED,
+    DELETEMESSAGECONFIDENCE
 } = require("./MessageHandler")
 
 const ActionMap = {
     ANSWER: /^ANSWER/,
     DELETE: /^DELETE/,
+    YES: /^YES/,
+    NO: /^NO/,
 }
+
+let MessageId
+let ChatId
+let StudentQuestion
 
 module.exports = (ctx, next) => {
     if (!ctx.update.callback_query)
@@ -30,15 +40,23 @@ const EventListener = {
         let QuestionText = studentQuestion.split('*')[1]
         sendQuestionText(QuestionText)
         ctx.session.state = STATE_LIST.ANSWER
-        await ctx.reply(ENTERANSWER)
+        await ctx.reply(ENTERANSWER, cancelAdviserAnswerBtn)
     },
     DELETE: async (ctx) => {
-        const MessageId = ctx.update.callback_query.message.message_id
-        const ChatId = ctx.update.callback_query.message.chat.id
-        const studentQuestion = ctx.update.callback_query.message.text
-        let QuestionText = studentQuestion.split('*')[1].split(":")[1]
+        MessageId = ctx.update.callback_query.message.message_id
+        ChatId = ctx.update.callback_query.message.chat.id
+        StudentQuestion = ctx.update.callback_query.message.text
+        ctx.reply(DELETEMESSAGECONFIDENCE, confidenceBtn)
+    },
+    YES: async (ctx) => {
+        let QuestionText = StudentQuestion.split('*')[1].split(":")[1]
         await Student.findOneAndDelete({MessageText: QuestionText})
         await ctx.telegram.deleteMessage(ChatId, MessageId)
+        await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
+        await ctx.reply(DELETEMESSAGEWASSUCCESSFUL)
+    },
+    NO: async (ctx) => {
+        await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
+        await ctx.reply(DELETEMESSAGEREQUESTCANCELED)
     }
 }
-

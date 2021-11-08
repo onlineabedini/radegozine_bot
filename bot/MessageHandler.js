@@ -88,14 +88,19 @@ module.exports.ENTERFIELD = "لطفا رشته ی تحصیلی خود را وا�
 module.exports.ENTERGRADE = "لطفا پایه ی تحصیلی خود را وارد نمایید : "
 module.exports.ENTERQUESTION = "لطفا سوال خود را را بصورت متنی وارد نمایید : "
 module.exports.ENTERANSWER = "لطفا پاسخ خود را بصورت ویس وارد نمایید : "
-module.exports.ENTERTEXTONLY = "لطفااطلاعات خواسته شده را فقط به صورت متنی وارد نمایید❗️ "
+module.exports.ENTERTEXTONLY = "لطفااطلاعات خواسته شده را فقط به صورت متنی وارد نمایید❗️"
 module.exports.TEXTMESSAGEONLY = "لطفا پیام خود را فقط به صورت متنی وارد نمایید❗️"
 module.exports.VOICEMESSAGEONLY = "لطفا پیام خود را فقط به صورت ویس وارد نمایید❗️"
 module.exports.SENDMESSAGEFORADVISERSWASSUCCESSFUL = "✅ پیام شما برای مشاوران با موفقیت ارسال شد."
 module.exports.SENDMESSAGEFORSTUDENTSWASSUCCESSFUL = "✅ پیام شما برای دانش آموزان با موفقیت ارسال شد."
 module.exports.SENDMESSAGEWASSUCCESSFUL = "✅ پیام شما با موفقیت ارسال شد."
+module.exports.DELETEMESSAGEWASSUCCESSFUL = "✅ پیام شما با موفقیت حذف شد."
+module.exports.DELETEMESSAGEREQUESTCANCELED = "✅ درخواست حذف پیام لغو شد."
+module.exports.DELETEMESSAGECONFIDENCE = "آیا از حذف این پیام اطمینان دارید؟"
+module.exports.SOMETHINGWENTWORNG = "خطایی پیش آمده است لطفا مجددا امتحان نمایید❗️"
 module.exports.QUESTIONREGISTERED = "✅ سوال شما ثبت گردید و دراسرع وقت توسط مشاوران پاسخ داده خواهد شد."
 module.exports.ANSWERREGISTERED = "✅ پاسخ شما ثبت شد و در کانال رد گزینه قرار گرفت."
+module.exports.THEQUESTIONWASANSWERED = "این پیام قبلا پاسخ داده شده است❗️"
 module.exports.YOURQUESTIONHASBEENANSWERED = "✅ سوال شما پاسخ داده شد و در کانال رد گزینه قرار گرفت."
 module.exports.SELECTANITEM = "لطفا از لیست زیر یک مورد را انتخاب نمایید ⬇️"
 module.exports.SEEPLANS = "برای دیدن طرح ها بر روی دکمه ی زیر کلیک کنید ⬇️"

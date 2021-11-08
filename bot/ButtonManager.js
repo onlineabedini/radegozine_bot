@@ -104,6 +104,25 @@ const answerBtn = {
     },
 }
 
+const confidenceBtn = {
+    reply_markup: {
+        resize_keyboard: true,
+        inline_keyboard: [
+            [{text: "خیر", callback_data: `NO`},
+             {text: "بله", callback_data: `YES`}],
+        ]
+    },
+}
+
+const cancelAdviserAnswerBtn = {
+    reply_markup: {
+        resize_keyboard: true,
+        inline_keyboard: [
+            [{text: "لغو", callback_data: "CANCEL"}],
+        ]
+    },
+}
+
 const addAdminCancelBtn = {
     reply_markup: {
         resize_keyboard: true,
@@ -184,6 +203,8 @@ module.exports = {
     manageAdminsBtns,
     manageAdvisersBtns,
     answerBtn,
+    confidenceBtn,
+    cancelAdviserAnswerBtn,
     cancelBtn,
     backBtn,
     plansBtn,
