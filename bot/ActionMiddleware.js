@@ -1,11 +1,13 @@
 const Student = require("../Student")
-const {STATE_LIST, sendQuestionText} = require("./SessionMiddleware")
+const {STATE_LIST, sendQuestionText, sendMessageDetails} = require("./SessionMiddleware")
 const {confidenceBtn, cancelAdviserAnswerBtn} = require("./ButtonManager")
 const {
     ENTERANSWER,
     DELETEMESSAGEWASSUCCESSFUL,
     DELETEMESSAGEREQUESTCANCELED,
-    DELETEMESSAGECONFIDENCE
+    DELETEMESSAGECONFIDENCE,
+    THISMESSAGEHASBEENDELETED,
+    DELETETIP
 } = require("./MessageHandler")
 
 const ActionMap = {
@@ -13,6 +15,7 @@ const ActionMap = {
     DELETE: /^DELETE/,
     YES: /^YES/,
     NO: /^NO/,
+    CANCEL: /^CANCEL/
 }
 
 let MessageId
@@ -36,11 +39,11 @@ module.exports = (ctx, next) => {
 
 const EventListener = {
     ANSWER: async (ctx) => {
-        const studentQuestion = ctx.update.callback_query.message.text
-        let QuestionText = studentQuestion.split('*')[1]
-        sendQuestionText(QuestionText)
+        const tempMessage = await ctx.reply(ENTERANSWER, cancelAdviserAnswerBtn)
+        sendQuestionText(ctx.update.callback_query.message.text.split('*')[1])
+        sendMessageDetails(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id, tempMessage.message_id)
         ctx.session.state = STATE_LIST.ANSWER
-        await ctx.reply(ENTERANSWER, cancelAdviserAnswerBtn)
+
     },
     DELETE: async (ctx) => {
         MessageId = ctx.update.callback_query.message.message_id
@@ -49,14 +52,39 @@ const EventListener = {
         ctx.reply(DELETEMESSAGECONFIDENCE, confidenceBtn)
     },
     YES: async (ctx) => {
-        let QuestionText = StudentQuestion.split('*')[1].split(":")[1]
-        await Student.findOneAndDelete({MessageText: QuestionText})
-        await ctx.telegram.deleteMessage(ChatId, MessageId)
-        await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
-        await ctx.reply(DELETEMESSAGEWASSUCCESSFUL)
+        if (StudentQuestion) {
+            await Student.findOneAndDelete({MessageText: StudentQuestion.split('*')[1].split(":")[1]})
+            try {
+                await ctx.telegram.deleteMessage(ChatId, MessageId)
+                await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
+                const tempMessage = await ctx.reply(DELETEMESSAGEWASSUCCESSFUL)
+                setTimeout(() => {
+                    ctx.telegram.deleteMessage(tempMessage.chat.id, tempMessage.message_id)
+                }, 3000)
+            } catch (err) {
+                console.log(err)
+                await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
+                const tempMessage = await ctx.reply(THISMESSAGEHASBEENDELETED)
+                setTimeout(() => {
+                    ctx.telegram.deleteMessage(tempMessage.chat.id, tempMessage.message_id)
+                }, 3000)
+            }
+        } else {
+            await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
+            const tempMessage = await ctx.reply(DELETETIP)
+            setTimeout(() => {
+                ctx.telegram.deleteMessage(tempMessage.chat.id, tempMessage.message_id)
+            }, 3000)
+        }
     },
     NO: async (ctx) => {
         await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
-        await ctx.reply(DELETEMESSAGEREQUESTCANCELED)
+        const tempMessage = await ctx.reply(DELETEMESSAGEREQUESTCANCELED)
+        setTimeout(() => {
+            ctx.telegram.deleteMessage(tempMessage.chat.id, tempMessage.message_id)
+        }, 3000)
+    },
+    CANCEL: async (ctx) => {
+        await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
     }
 }

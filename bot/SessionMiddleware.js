@@ -4,6 +4,7 @@ const Student = require("../Student")
 const Users = require("../User")
 const config = require("config")
 let QuestionText
+let MessageDatails
 
 const {
     MAIN_BUTTONS_TEXT,
@@ -40,7 +41,7 @@ const {
     ADVISERREMOVED,
     voiceCaption,
     SOMETHINGWENTWORNG,
-    THEQUESTIONWASANSWERED
+    INVALIDUSERNAME,
 } = require("./MessageHandler")
 
 const STATE_LIST = {
@@ -75,6 +76,11 @@ module.exports.sendQuestionText = (StudentQuestionText) => {
     QuestionText.push(StudentQuestionText)
 }
 
+module.exports.sendMessageDetails = (chatId, messageId1, messageId2) => {
+    MessageDatails = []
+    MessageDatails.push(chatId, messageId1, messageId2)
+}
+
 const EventListener = {
     [STATE_LIST.ADDADMIN]: async (ctx, next) => {
         ctx.session.state = undefined
@@ -82,9 +88,14 @@ const EventListener = {
             if (ctx.message.text) {
                 const InputText = ctx.message.text
                 const AdminUsername = InputText.split("@")[1]
-                ctx.session.stateData = {...ctx.session.stateData, AdminUsername}
-                ctx.session.state = STATE_LIST.GETADMINFULLNAME
-                await ctx.reply(ENTERADMINFULLNAME)
+                if (AdminUsername) {
+                    ctx.session.stateData = {...ctx.session.stateData, AdminUsername}
+                    ctx.session.state = STATE_LIST.GETADMINFULLNAME
+                    await ctx.reply(ENTERADMINFULLNAME)
+                } else {
+                    ctx.reply(INVALIDUSERNAME, manageAdminsBtns)
+                }
+
             } else {
                 await ctx.reply(ENTERTEXTONLY, manageAdminsBtns)
             }
@@ -140,9 +151,13 @@ const EventListener = {
             if (ctx.message.text) {
                 const InputText = ctx.message.text
                 const AdviserUsername = InputText.split("@")[1]
-                ctx.session.stateData = {...ctx.session.stateData, AdviserUsername}
-                ctx.session.state = STATE_LIST.GETADVISERFULLNAME
-                await ctx.reply(ENTERADVISERFULLNAME)
+                if (AdviserUsername) {
+                    ctx.session.stateData = {...ctx.session.stateData, AdviserUsername}
+                    ctx.session.state = STATE_LIST.GETADVISERFULLNAME
+                    await ctx.reply(ENTERADVISERFULLNAME)
+                } else {
+                    ctx.reply(INVALIDUSERNAME, manageAdvisersBtns)
+                }
             } else {
                 await ctx.reply(ENTERTEXTONLY, manageAdvisersBtns)
             }
@@ -206,9 +221,7 @@ const EventListener = {
                         const MessageId = ctx.message.message_id
                         await ctx.telegram.forwardMessage(ChatId, ctx.message.chat.id, MessageId)
                     } else {
-                        await ctx.reply(`
-                    ارسال پیام برای ${adviser.Fullname} انجام نگرفت 
-                    دلیل بروز این خطا میتواند استارت نکردن بات از جانب کاربر و یا وجود نداشتن این کاربر باشد`)
+                        console.log(`the username (${adviser.Username}) has not started the bot or does not exist`)
                     }
                 }
                 await ctx.reply(SENDMESSAGEFORADVISERSWASSUCCESSFUL, AdminsStartBtns)
@@ -235,12 +248,9 @@ const EventListener = {
     }, [STATE_LIST.SENDMESSAGEFORADMINS]: async (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.message && ctx.message.text !== MAIN_BUTTONS_TEXT.CANCEL) {
-            const chatId = ctx.message.chat.id
-            const username = ctx.message.chat.username
-            const messageId = ctx.message.message_id
-            let adviser = await Adviser.findOne({ChatId: chatId})
-            adviser.Username = username
-            adviser.MessageId.push(messageId)
+            let adviser = await Adviser.findOne({ChatId: ctx.message.chat.id})
+            adviser.Username = ctx.message.chat.username
+            adviser.MessageId.push(ctx.message.message_id)
             adviser.save()
             await ctx.reply(SENDMESSAGEWASSUCCESSFUL, AdvisersStartBtns)
         } else next()
@@ -317,20 +327,25 @@ const EventListener = {
     }, [STATE_LIST.ANSWER]: async (ctx, next) => {
         ctx.session.state = undefined
         if (ctx.update.callback_query?.data && ctx.update.callback_query.data !== "CANCEL") {
-            ctx.reply(SOMETHINGWENTWORNG)
+            const tempMessage = await ctx.reply(SOMETHINGWENTWORNG)
+            await ctx.telegram.deleteMessage(MessageDatails[0], MessageDatails[2])
+            setTimeout(() => {
+                ctx.telegram.deleteMessage(tempMessage.chat.id, tempMessage.message_id)
+            }, 3000)
         } else if (ctx.update.callback_query?.data === "CANCEL") {
             await ctx.telegram.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id)
         } else if (ctx.message?.voice) {
+            await ctx.telegram.sendVoice(config.get("ChannelChatId"), ctx.message.voice.file_id, {caption: voiceCaption(QuestionText[0])})
+            const tempMessage = await ctx.reply(ANSWERREGISTERED)
             const student = await Student.findOne({MessageText: QuestionText[0].split(":")[1]})
-            if (student) {
-                await ctx.telegram.sendVoice(config.get("ChannelChatId"), ctx.message.voice.file_id, {caption: voiceCaption(QuestionText[0])})
-                await ctx.reply(ANSWERREGISTERED)
-                await ctx.telegram.sendMessage(student.ChatId, YOURQUESTIONHASBEENANSWERED)
-                await Student.findOneAndDelete({MessageText: QuestionText[0].split(":")[1]})
-            } else {
-                await ctx.telegram.deleteMessage(ctx.update.message.chat.id, ctx.update.message.message_id)
-                ctx.reply(THEQUESTIONWASANSWERED)
-            }
+            await ctx.telegram.sendMessage(student.ChatId, YOURQUESTIONHASBEENANSWERED)
+            await ctx.telegram.deleteMessage(ctx.message.chat.id, ctx.message.message_id)
+            await ctx.telegram.deleteMessage(MessageDatails[0], MessageDatails[2])
+            await ctx.telegram.deleteMessage(MessageDatails[0], MessageDatails[1])
+            setTimeout(() => {
+                ctx.telegram.deleteMessage(tempMessage.chat.id, tempMessage.message_id)
+            }, 3000)
+            await Student.findOneAndDelete({MessageText: QuestionText[0].split(":")[1]})
         } else {
             await ctx.reply(VOICEMESSAGEONLY)
             next()

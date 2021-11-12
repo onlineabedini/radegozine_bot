@@ -35,7 +35,8 @@ const {
     REQUESTCANCELED,
     SEEPLANS,
     CONTACTWITHADMIN,
-    BOTDEVELOPERSCAPTION
+    BOTDEVELOPERSCAPTION,
+    ADVISERSAUTHENTICATION,
 } = require("./MessageHandler")
 const {STATE_LIST} = require("./SessionMiddleware")
 
@@ -103,7 +104,6 @@ EventListener = {
         } else {
             await ctx.reply(ADVISERNOTFOUND)
         }
-
     }, [MAIN_BUTTONS_TEXT.MANAGEADMINS]: async (ctx) => {
         ctx.session.state = undefined
         await ctx.reply(SELECTANITEM, manageAdminsBtns)
@@ -111,8 +111,13 @@ EventListener = {
         ctx.session.state = undefined
         await ctx.reply(SELECTANITEM, manageAdvisersBtns)
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADMINS]: async (ctx) => {
-        ctx.session.state = STATE_LIST.SENDMESSAGEFORADMINS
-        await ctx.reply(ENTERMESSAGE, cancelBtn)
+        let adviser = await Adviser.findOne({ChatId: ctx.message.chat.id})
+        if (adviser) {
+            ctx.session.state = STATE_LIST.SENDMESSAGEFORADMINS
+            await ctx.reply(ENTERMESSAGE, cancelBtn)
+        } else {
+            ctx.reply(ADVISERSAUTHENTICATION, StudentsStartBtns)
+        }
     }, [MAIN_BUTTONS_TEXT.SENDMESSAGEFORADVISERS]: async (ctx) => {
         ctx.session.state = STATE_LIST.SENDMESSAGEFORADVISERS
         await ctx.reply(ENTERMESSAGE, cancelBtn)
@@ -129,15 +134,22 @@ EventListener = {
         ctx.session.state = undefined
         const StudentsData = await Student.find()
         const StudentsIds = StudentsData.map(element => element.id)
-        if (StudentsIds.length !== 0) {
-            await ctx.reply(STUDENTSQUESTIONSLIST)
-            for (item in StudentsIds) {
-                let student = await Student.findOne({_id: StudentsIds[item]})
-                await ctx.telegram.sendMessage(ctx.message.chat.id, studentInfoMessage(student), answerBtn)
+        let adviser = await Adviser.findOne({Username: ctx.message.chat.username})
+        let admin = await Admin.findOne({Username: ctx.message.chat.username})
+        if (admin || adviser) {
+            if (StudentsIds.length !== 0) {
+                await ctx.reply(STUDENTSQUESTIONSLIST)
+                for (item in StudentsIds) {
+                    let student = await Student.findOne({_id: StudentsIds[item]})
+                    await ctx.telegram.sendMessage(ctx.message.chat.id, studentInfoMessage(student), answerBtn)
+                }
+            } else {
+                await ctx.reply(EMPTYLIST)
             }
         } else {
-            await ctx.reply(EMPTYLIST)
+            ctx.reply(ADVISERSAUTHENTICATION, StudentsStartBtns)
         }
+
     },
     [MAIN_BUTTONS_TEXT.ADVISERSQUESTIONSLIST]: async (ctx) => {
         ctx.session.state = undefined
@@ -145,18 +157,19 @@ EventListener = {
         const AdvisersIds = AdvisersData.map(element => element.id)
         if (AdvisersIds.length !== 0) {
             MessageIds = []
+            await ctx.reply(ADVISERSQUESTIONSLIST)
             for (item in AdvisersIds) {
                 let adviser = await Adviser.findOne({_id: AdvisersIds[item]})
                 let MessageId = adviser.MessageId
                 if (MessageId.length !== 0) {
-                    await ctx.reply(ADVISERSQUESTIONSLIST)
                     MessageIds.push(MessageId)
                     for (item in MessageId) {
                         await ctx.telegram.forwardMessage(ctx.message.chat.id, adviser.ChatId, MessageId[item])
                     }
-                } else if (MessageIds.length === 0) {
-                    await ctx.reply(EMPTYLIST)
                 }
+            }
+            if (MessageIds.length === 0) {
+                await ctx.reply(EMPTYLIST)
             }
         } else {
             await ctx.reply(EMPTYLIST)
