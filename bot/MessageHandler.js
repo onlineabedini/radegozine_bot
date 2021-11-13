@@ -31,12 +31,18 @@ module.exports.adviserInfoMessage = (adviser) => `
 
 `
 module.exports.studentInfoMessage = (Student) => `
-*سوال :${Student.MessageText}*
+❓سوال :${Student.MessageText}❓
+
 👨‍🎓مشخصات دانش آموز :
-🔹نام و نام خانوادگی :${Student.Fullname}
-🔹رشته ی تحصیلی :${Student.Field}
-🔹پایه ی تحصیلی :${Student.Grade}
-🔹یوزنیم دانش آموز :@${Student.Username}
+
+🔹نام و نام خانوادگی : ${Student.Fullname}
+
+🔹رشته ی تحصیلی : ${Student.Field}
+
+🔹پایه ی تحصیلی : ${Student.Grade}
+
+🔹یوزنیم دانش آموز : @${Student.Username}
+
 @radegozine_bot`
 
 module.exports.voiceCaption = (QuestionText) => `

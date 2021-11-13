@@ -1,3 +1,3 @@
 module.exports = async (ctx) => {
-    console.log(ctx)
-}
+  console.log(ctx);
+};
